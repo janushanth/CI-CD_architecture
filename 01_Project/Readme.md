@@ -25,6 +25,7 @@ Create the Artifactory repo - docker-repo
 
 
 ### Nexus ####
+Nexus Login URL - http://localhost:8082/
 docker exec nexus cat /nexus-data/admin.password
 default username - admin
 new password -nexusadmin
@@ -38,6 +39,9 @@ Create the Artifactory repo - helm-repo
 docker login -u admin -p <your-password> http://localhost:8083
 docker login -u admin -p nexusadmin http://localhost:8083
 docker login -u jenkins -p Jenkins@123# http://localhost:8083
+
+http://localhost:8083/repository/docker-repo/
+http://localhost:8082/repository/helm-repo/
 
 
 

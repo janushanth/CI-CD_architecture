@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: app-a
+  namespace: argocd
+spec:
+  destination:
+    namespace: python-apps-ns
+    server: https://kubernetes.default.svc
+  source:
+    repoURL: https://nexus.example.com/repository/helm-charts/
+    chart: python-app
+    targetRevision: 1.2.3
+    helm:
+      valueFiles:
+        - environments/dev/values.yaml
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+  syncOptions:
+    - CreateNamespace=true
