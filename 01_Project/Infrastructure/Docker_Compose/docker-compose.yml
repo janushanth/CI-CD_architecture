@@ -1,0 +1,86 @@
+version: '3.8'  # Specifies the Docker Compose file format version.
+
+services:  # Defines the services (containers) to be created.
+  # artifactory:  # Service name for JFrog Artifactory.
+  #   image: docker.bintray.io/jfrog/artifactory-oss:latest  # Specifies the Artifactory image to use.
+  #   container_name: artifactory  # Sets a custom name for the Artifactory container.
+  #   restart: always  # Ensures the container restarts automatically if it stops.
+  #   ports:  # Maps container ports to the host machine.
+  #     - "8081:8081"  # Maps port 8081 for the Artifactory UI/Web interface.
+  #     - "8300:8082"  # Maps port 8082 for HTTP communication.
+  #     - "8046:8046"  # Maps port 8046 for internal communication.
+  #   networks:  # Specifies the network(s) the container will connect to.
+  #     - ecosystem  # Connects to the 'ecosystem' network.
+  #   depends_on:  # Specifies service dependencies.
+  #     db:  # Artifactory depends on the 'db' service.
+  #       condition: service_healthy  # Waits for the 'db' service to be healthy before starting.
+  #   volumes:  # Mounts host directories or volumes into the container.
+  #     - artifactory_data:/var/opt/jfrog/artifactory  # Persists Artifactory data.
+  #     - ./artifactory.key:/var/opt/jfrog/artifactory/etc/security/master.key  # Mounts the master key file for encryption.
+  #     - ./system.yaml:/var/opt/jfrog/artifactory/etc/system.yaml  # Mounts the system configuration file.
+  #   environment:  # Sets environment variables for the container.
+  #     - DB_TYPE=postgresql  # Specifies the database type.
+  #     - DB_URL=jdbc:postgresql://db:5432/artifactory  # Database connection URL.
+  #     - DB_USER=artifactory  # Database username.
+  #     - DB_PASSWORD=artifactory  # Database password.
+  #     - ARTIFACTORY_JDBC_URL=jdbc:postgresql://db:5432/artifactory  # JDBC URL for Artifactory.
+  #     - ARTIFACTORY_JDBC_DRIVER=org.postgresql.Driver  # JDBC driver for PostgreSQL.
+  #     - ARTIFACTORY_JDBC_USERNAME=artifactory  # JDBC username for Artifactory.
+  #     - ARTIFACTORY_JDBC_PASSWORD=artifactory  # JDBC password for Artifactory.
+
+  # db:  # Service name for the PostgreSQL database.
+  #   image: postgres:latest  # Specifies the PostgreSQL image to use.
+  #   container_name: postgres  # Sets a custom name for the PostgreSQL container.
+  #   restart: always  # Ensures the container restarts automatically if it stops.
+  #   networks:  # Specifies the network(s) the container will connect to.
+  #     - ecosystem  # Connects to the 'ecosystem' network.
+  #   environment:  # Sets environment variables for the container.
+  #     POSTGRES_DB: artifactory  # Name of the database to create.
+  #     POSTGRES_USER: artifactory  # Database username.
+  #     POSTGRES_PASSWORD: artifactory  # Database password.
+  #   volumes:  # Mounts host directories or volumes into the container.
+  #     - pgdata:/var/lib/postgresql/data  # Persists PostgreSQL data.
+  #   healthcheck:  # Defines a health check for the service.
+  #     test: ["CMD", "pg_isready", "-U", "artifactory"]  # Command to check if the database is ready.
+  #     interval: 10s  # Time between health check attempts.
+  #     retries: 5  # Number of retries before marking the service as unhealthy.
+  #     start_period: 20s  # Time to wait before starting health checks.
+
+
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    user: root  # Run Jenkins as root to avoid permission issues
+    restart: always
+    ports:
+      - "8100:8080"
+      - "50000:50000"
+    networks:
+      - ecosystem
+    volumes:
+      - ~/jenkins_home_tech:/var/jenkins_home  # Make sure permissions are correct     
+      - /var/run/docker.sock:/var/run/docker.sock  # Allow Jenkins to interact with the Docker daemon
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock  # Set the Docker host to the socket
+
+  nexus:
+    image: sonatype/nexus3:latest
+    container_name: nexus
+    restart: always
+    ports:
+      - "8082:8081"  # Nexus UI and API
+      - "8083:8083"  # Repository access (Docker, Helm, etc.)
+    networks:
+      - ecosystem
+    volumes:
+      - nexus_data:/nexus-data  # Persist Nexus repository data
+    environment:
+      - INSTALL4J_ADD_VM_PARAMS=-Xms512m -Xmx2g -XX:MaxDirectMemorySize=2g  # Set memory limits for Nexus      
+
+networks:  # Defines custom networks for the services.
+  ecosystem:  # Creates a network named 'ecosystem'.
+
+volumes:  # Defines named volumes for persistent data storage.
+  # pgdata:  # Volume for PostgreSQL data.
+  # artifactory_data:  # Volume for Artifactory data.
+  nexus_data:  # Volume for Nexus storage

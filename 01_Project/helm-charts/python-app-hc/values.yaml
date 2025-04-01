@@ -1,0 +1,26 @@
+replicaCount: 1
+
+image:
+  repository: localhost:8083/repository/docker-repo/python-flask-app
+  pullPolicy: Always
+  tag: "63"
+
+imagePullSecrets:
+  enabled: true
+  name: my-registry-secret
+  registry: localhost:8083
+  username: "jenkins"
+  password: "Jenkins@123#"
+  email: "jenkins@gmail.com"
+
+service:
+  name: python-app
+  type: ClusterIP
+  port: 5000
+
+ingress:
+  enabled: true
+  host: localhost
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  tls: []

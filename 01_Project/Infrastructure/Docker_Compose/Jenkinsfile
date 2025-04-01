@@ -1,0 +1,60 @@
+pipeline {
+    agent any
+
+    environment {
+        GIT_REPO = 'https://github.com/janushanth/docker_learn.git'
+        DOCKER_IMAGE = 'localhost:8083/repository/docker-repo/python-flask-app' // Nexus Docker repository URL
+        NEXUS_CREDENTIALS = 'nexus-credentials' // Jenkins credentials ID for Nexus
+        DOCKER_IMAGE_TAG = "${DOCKER_IMAGE}:${BUILD_ID}" // Tag Docker image with build ID
+        OLD_TAG = "${DOCKER_IMAGE}:${BUILD_ID - 1}" // Previous tag based on the previous build ID
+    }
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git credentialsId: 'github-credentials', url: "${GIT_REPO}", branch: 'main'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    // Build the Docker image using the Dockerfile in the specified path
+                    docker.build("${DOCKER_IMAGE_TAG}", "Class_01-basic-python-dockerfile")
+                }
+            }
+        }
+
+        stage('Login to Nexus Docker Registry') {
+            steps {
+                script {
+                    // Login to Nexus Docker repository using Docker credentials
+                    withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                        sh """
+                            echo ${PASSWORD} | docker login -u ${USERNAME} --password-stdin http://localhost:8083/repository/docker-repo/
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Push Docker Image to Nexus') {
+            steps {
+                script {
+                    // Push the Docker image to Nexus
+                    sh "docker push ${DOCKER_IMAGE_TAG}"
+                }
+            }
+        }
+
+        stage('Remove Old Docker Image Tag Locally') {
+            steps {
+                script {
+                    // Remove the old tag locally (if it exists)
+                    echo "Removing old tag: ${OLD_TAG} locally"
+                    sh "docker rmi ${OLD_TAG} || true" // Use '|| true' to ignore errors if the tag does not exist
+                }
+            }
+        }
+    }
+}
