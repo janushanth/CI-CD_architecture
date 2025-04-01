@@ -8,6 +8,8 @@ Install plungin - Docker Pipeline ,Artifactory
 Find the Artifactory section and click Add Artifactory Server.
 Provide the necessary Artifactory URL, credentials, and repository details.
 
+Jenkins login URL - http://localhost:8100/
+
     2  apt-get update
     3  apt-get install -y docker.io
     4  docker --version
