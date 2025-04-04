@@ -102,6 +102,8 @@ helm package .
 helm push python-app-0.1.0.tgz oci://localhost:8083/repository/helm-repo
 curl -u admin:nexusadmin --upload-file python-app-0.1.1.tgz http://localhost:8082/repository/helm-repo
 
+curl -u admin:nexusadmin --upload-file var.tar.gz http://localhost:8082/repository/helm-repo
+
 ## ------------ this for helm push plugin ######
 helm plugin install https://github.com/chartmuseum/helm-push.git
 helm repo add helm-repo http://localhost:8082/repository/helm-repo
