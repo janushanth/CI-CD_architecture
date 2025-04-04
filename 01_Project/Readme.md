@@ -10,9 +10,20 @@ Provide the necessary Artifactory URL, credentials, and repository details.
 
 Jenkins login URL - http://localhost:8100/
 
+Jenkins server need to installation
+
     2  apt-get update
     3  apt-get install -y docker.io
     4  docker --version
+
+apt-get install -y curl
+curl https://baltocdn.com/helm/signing.asc | apt-key add -
+apt-get install apt-transport-https --yes
+echo "deb https://baltocdn.com/helm/stable/debian/ all main" | tee /etc/apt/sources.list.d/helm-stable-debian.list
+apt-get update
+apt-get install -y helm
+helm version --short
+
 
 ### Please Read the Jenkins files ######
 #### artifactory #####
@@ -85,6 +96,17 @@ kubectl get svc -n ingress-nginx
 curl -v http://localhost:32266/api
 
 
+## Helm Packing and Pushing to Nexus
+cd python-app-hc/
+helm package .
+helm push python-app-0.1.0.tgz oci://localhost:8083/repository/helm-repo
+curl -u admin:nexusadmin --upload-file python-app-0.1.1.tgz http://localhost:8082/repository/helm-repo
+
+## ------------ this for helm push plugin ######
+helm plugin install https://github.com/chartmuseum/helm-push.git
+helm repo add helm-repo http://localhost:8082/repository/helm-repo
+helm push python-app-0.1.1.tgz helm-repo
+---------------------------------------
 
 #### argocd ###
 kubectl create namespace argocd
