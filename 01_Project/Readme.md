@@ -24,6 +24,10 @@ apt-get update
 apt-get install -y helm
 helm version --short
 
+apt-get update && apt-get install -y iputils-ping
+curl -I http://nexus:8081
+
+
 
 ### Please Read the Jenkins files ######
 #### artifactory #####
@@ -102,7 +106,10 @@ helm package .
 helm push python-app-0.1.0.tgz oci://localhost:8083/repository/helm-repo
 curl -u admin:nexusadmin --upload-file python-app-0.1.1.tgz http://localhost:8082/repository/helm-repo
 
-curl -u admin:nexusadmin --upload-file var.tar.gz http://localhost:8082/repository/helm-repo
+
+working (helm chart format only working and compose need bridge network)
+curl -u admin:nexusadmin --upload-file mychart-0.1.0.tgz http://nexus:8081/repository/helm-repo/
+
 
 ## ------------ this for helm push plugin ######
 helm plugin install https://github.com/chartmuseum/helm-push.git

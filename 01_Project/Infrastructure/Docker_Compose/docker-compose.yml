@@ -79,6 +79,7 @@ services:  # Defines the services (containers) to be created.
 
 networks:  # Defines custom networks for the services.
   ecosystem:  # Creates a network named 'ecosystem'.
+      driver: bridge
 
 volumes:  # Defines named volumes for persistent data storage.
   # pgdata:  # Volume for PostgreSQL data.
