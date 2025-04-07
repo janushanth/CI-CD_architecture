@@ -29,6 +29,17 @@ curl -I http://nexus:8081
 
 apt-get update && apt-get install -y ca-certificates
 
+Regenerate the GitHub token with correct scopes:
+
+Go to https://github.com/settings/tokens
+
+apt-get update && apt-get install -y dnsutils
+
+
+
+create the Personal access tokens (classic) to push the code to repo
+
+
 
 
 ### Please Read the Jenkins files ######
