@@ -1,58 +1,132 @@
 pipeline {
     agent any
 
+    parameters {
+        string(name: 'SOURCE_REPO', defaultValue: 'https://github.com/janushanth/docker_learn.git', description: 'Source repository URL')
+        string(name: 'HELM_REPO', defaultValue: 'https://github.com/janushanth/CI-CD_architecture.git', description: 'Helm Chart repository URL')
+        string(name: 'CHART_NAME', defaultValue: 'python-app-hc', description: 'Name of the Helm chart')
+        string(name: 'DOCKER_IMAGE', defaultValue: 'localhost:8083/repository/docker-repo/python-flask-app', description: 'Docker image URL')
+        string(name: 'NEXUS_CREDENTIALS', defaultValue: 'nexus-credentials', description: 'Nexus credentials ID')
+        string(name: 'NEXUS_DOCKER_URL', defaultValue: 'http://localhost:8083/repository/docker-repo/', description: 'Nexus Docker repository URL')
+        string(name: 'NEXUS_HELM_URL', defaultValue: 'http://nexus:8081/repository/helm-repo/', description: 'Nexus Helm repository URL')
+        string(name: 'GIT_REPO_URL', defaultValue: 'https://github.com/janushanth/CI-CD_architecture.git', description: 'Git repository URL for Helm charts')
+    }
+
     environment {
-        GIT_REPO = 'https://github.com/janushanth/docker_learn.git'
-        DOCKER_IMAGE = 'localhost:8083/repository/docker-repo/python-flask-app' // Nexus Docker repository URL
-        NEXUS_CREDENTIALS = 'nexus-credentials' // Jenkins credentials ID for Nexus
-        DOCKER_IMAGE_TAG = "${DOCKER_IMAGE}:${BUILD_ID}" // Tag Docker image with build ID
-        OLD_TAG = "${DOCKER_IMAGE}:${BUILD_ID - 1}" // Previous tag based on the previous build ID
+        DOCKER_IMAGE_TAG = "${DOCKER_IMAGE}:${BUILD_ID}"
+        OLD_TAG = "${DOCKER_IMAGE}:${BUILD_ID - 1}"
+        CHART_VERSION = "${BUILD_ID}.0.0"
     }
 
     stages {
-        stage('Clone Repository') {
+        stage('Clean Workspace') {
             steps {
-                git credentialsId: 'github-credentials', url: "${GIT_REPO}", branch: 'main'
+                deleteDir()
+            }
+        }
+
+        stage('Clone App Repo') {
+            steps {
+                git credentialsId: 'github-credentials', url: "${params.SOURCE_REPO}", branch: 'main'
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Build the Docker image using the Dockerfile in the specified path
                     docker.build("${DOCKER_IMAGE_TAG}", "Class_01-basic-python-dockerfile")
                 }
             }
         }
 
-        stage('Login to Nexus Docker Registry') {
+        stage('Login to Nexus') {
             steps {
                 script {
-                    // Login to Nexus Docker repository using Docker credentials
-                    withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    withCredentials([usernamePassword(credentialsId: "${params.NEXUS_CREDENTIALS}", usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                        sh "echo ${PASSWORD} | docker login -u ${USERNAME} --password-stdin ${params.NEXUS_DOCKER_URL}"
+                    }
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                sh "docker push ${DOCKER_IMAGE_TAG}"
+            }
+        }
+
+        stage('Remove Old Tag') {
+            steps {
+                sh "docker rmi ${OLD_TAG} || true"
+            }
+        }
+
+        stage('Clone Helm Chart Repo') {
+            steps {
+                dir('helm-chart') {
+                    git credentialsId: 'github-credentials', url: "${params.HELM_REPO}", branch: 'main'
+                }
+            }
+        }
+
+        stage('Update values.yaml') {
+            steps {
+                dir('helm-chart') {
+                    script {
                         sh """
-                            echo ${PASSWORD} | docker login -u ${USERNAME} --password-stdin http://localhost:8083/repository/docker-repo/
+                            sed -i 's|tag:.*|tag: ${BUILD_ID}|' 01_Project/helm-charts/${CHART_NAME}/values.yaml
                         """
                     }
                 }
             }
         }
 
-        stage('Push Docker Image to Nexus') {
+        stage('Package Helm Chart') {
             steps {
-                script {
-                    // Push the Docker image to Nexus
-                    sh "docker push ${DOCKER_IMAGE_TAG}"
+                dir('helm-chart') {
+                    sh """
+                        helm lint 01_Project/helm-charts/${CHART_NAME}
+                        helm package 01_Project/helm-charts/${CHART_NAME} --version ${CHART_VERSION}
+                    """
                 }
             }
         }
 
-        stage('Remove Old Docker Image Tag Locally') {
+        stage('Push Helm Chart to Nexus') {
             steps {
-                script {
-                    // Remove the old tag locally (if it exists)
-                    echo "Removing old tag: ${OLD_TAG} locally"
-                    sh "docker rmi ${OLD_TAG} || true" // Use '|| true' to ignore errors if the tag does not exist
+                dir('helm-chart') {
+                    script {
+                        withCredentials([usernamePassword(credentialsId: "${params.NEXUS_CREDENTIALS}", usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                            sh """
+                                curl -v -u ${USERNAME}:${PASSWORD} --upload-file ${CHART_NAME}-${CHART_VERSION}.tgz ${params.NEXUS_HELM_URL}
+                            """
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Commit Updated values.yaml') {
+            steps {
+                dir('helm-chart') {
+                    script {
+                        withCredentials([usernamePassword(credentialsId: 'github-credentials', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
+                            sh """	
+                                git config --global --unset credential.helper || true
+                                git remote remove origin || true
+                                 
+                                # Set the remote URL correctly without any repetition
+                                git remote add origin ${params.GIT_REPO_URL}
+                                
+                                # Add the file changes and commit
+                                git add 01_Project/helm-charts/${CHART_NAME}/values.yaml
+                                git commit -m "Update image tag to ${BUILD_ID}" || echo "No changes to commit"
+                                
+                                # Push the changes to the main branch using the token for authentication
+                                git push https://janushanth:${TOKEN}@github.com/janushanth/CI-CD_architecture.git HEAD:main                            
+                            """
+                        }
+                    }
                 }
             }
         }
