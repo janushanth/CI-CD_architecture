@@ -27,6 +27,8 @@ helm version --short
 apt-get update && apt-get install -y iputils-ping
 curl -I http://nexus:8081
 
+apt-get update && apt-get install -y ca-certificates
+
 
 
 ### Please Read the Jenkins files ######
