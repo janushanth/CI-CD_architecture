@@ -35,8 +35,6 @@ Go to https://github.com/settings/tokens
 
 apt-get update && apt-get install -y dnsutils
 
-
-
 create the Personal access tokens (classic) to push the code to repo
 
 
