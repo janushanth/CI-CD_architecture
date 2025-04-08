@@ -8,9 +8,9 @@ spec:
     namespace: python-apps-ns
     server: https://kubernetes.default.svc
   source:
-    repoURL: https://nexus.example.com/repository/helm-charts/
-    chart: python-app
-    targetRevision: 1.2.3
+    repoURL: http://host.docker.internal:8082/repository/helm-repo/
+    chart: python-app-hc
+    targetRevision: 55.0.0
     helm:
       valueFiles:
         - environments/dev/values.yaml

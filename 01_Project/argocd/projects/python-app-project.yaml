@@ -5,9 +5,9 @@ metadata:
   namespace: argocd
 spec:
   sourceRepos:
-    - https://nexus.example.com/repository/helm-charts/
+    - http://host.docker.internal:8082/repository/helm-repo/
   destinations:
-    - namespace: dev-apps
+    - namespace: python-apps-ns
       server: https://kubernetes.default.svc
   namespaceResourceWhitelist:
     - group: apps
