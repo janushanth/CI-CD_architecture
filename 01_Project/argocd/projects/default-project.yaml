@@ -13,7 +13,7 @@ spec:
 
   # Allow apps to source manifests from these Git or Helm repos
   sourceRepos:
-    - http://localhost:8082/repository/helm-repo/
+    - http://host.docker.internal:8082/repository/helm-repo/
     - https://github.com/janushanth/CI-CD_architecture.git
 
   # Optional: Limit allowed Helm chart versions
