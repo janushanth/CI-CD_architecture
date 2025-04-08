@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: localhost:8083/repository/docker-repo/python-flask-app
   pullPolicy: Always
-  tag: 55
+  tag: 56
 
 imagePullSecrets:
   enabled: true
