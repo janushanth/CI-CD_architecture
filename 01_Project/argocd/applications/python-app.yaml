@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: http://host.docker.internal:8082/repository/helm-repo/
     chart: python-app-hc
-    targetRevision: 55.0.0              # version of the chart
+    targetRevision: "*"            # version of the chart
     helm:
       valueFiles:
         - values.yaml                   # optional, if you have inline or remote values
