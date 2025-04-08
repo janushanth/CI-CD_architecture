@@ -14,7 +14,7 @@ spec:
         - values.yaml                   # optional, if you have inline or remote values
   destination:
     server: https://kubernetes.default.svc
-    namespace: my-app
+    namespace: python-app-np
   syncPolicy:
     automated:
       prune: true
