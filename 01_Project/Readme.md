@@ -114,9 +114,11 @@ curl -v http://localhost:32266/api
 ## Helm Packing and Pushing to Nexus
 cd python-app-hc/
 helm package .
-helm push python-app-0.1.0.tgz oci://localhost:8083/repository/helm-repo
-curl -u admin:nexusadmin --upload-file python-app-0.1.1.tgz http://localhost:8082/repository/helm-repo
+helm push python-app-hc-0.1.1.tgz oci://localhost:8083/repository/helm-repo
 
+helm push python-app-hc-0.1.1.tgz oci://localhost:8083/repository/helm-repo
+
+curl -u admin:nexusadmin --upload-file python-app-0.1.1.tgz http://localhost:8082/repository/helm-repo/
 
 working (helm chart format only working and compose need bridge network)
 curl -u admin:nexusadmin --upload-file mychart-0.1.0.tgz http://nexus:8081/repository/helm-repo/
@@ -127,6 +129,7 @@ helm plugin install https://github.com/chartmuseum/helm-push.git
 helm repo add helm-repo http://localhost:8082/repository/helm-repo
 helm push python-app-0.1.1.tgz helm-repo
 ---------------------------------------
+
 
 #### argocd ###
 kubectl create namespace argocd
@@ -142,6 +145,21 @@ kubectl get svc argocd-server -n argocd
 kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 -d && echo
 
 https://localhost:31626
-username - admin
-password - JdidcnpEhU-Xvqiy
+argocd username - admin
+argocd password - JdidcnpEhU-Xvqiy
 
+# 🔧 Install ArgoCD CLI
+# Linux
+curl -sSL -o argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+chmod +x argocd
+sudo mv argocd /usr/local/bin/
+argocd version
+
+argocd login localhost:31626 --username admin --password JdidcnpEhU-Xvqiy
+
+argocd repo add http://host.docker.internal:8082/repository/helm-repo/ \
+  --type helm \
+  --name nexus-helm \
+  --username admin \
+  --password nexusadmin
+  
