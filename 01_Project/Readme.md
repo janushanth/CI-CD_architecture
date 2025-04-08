@@ -163,3 +163,4 @@ argocd repo add http://host.docker.internal:8082/repository/helm-repo/ \
   --username admin \
   --password nexusadmin
   
+kubectl apply -f root-app.yaml -n argocd  
