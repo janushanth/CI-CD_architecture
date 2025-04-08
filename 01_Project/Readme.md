@@ -131,3 +131,17 @@ helm push python-app-0.1.1.tgz helm-repo
 #### argocd ###
 kubectl create namespace argocd
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+kubectl get pods -n argocd
+##  Port-forward the Argo CD API server:
+kubectl port-forward svc/argocd-server -n argocd 9000:443
+
+kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "NodePort"}}'
+kubectl get svc argocd-server -n argocd
+
+# Get the initial admin password:
+kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 -d && echo
+
+https://localhost:31626
+username - admin
+password - JdidcnpEhU-Xvqiy
+
