@@ -1,16 +1,29 @@
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
-  name: dev-project
+  name: default
   namespace: argocd
 spec:
-  sourceRepos:
-    - http://host.docker.internal:8082/repository/helm-repo/
+  description: Default project for all apps
+
+  # Allow apps in this project to deploy to these clusters/namespaces
   destinations:
-    - namespace: python-apps-ns
+    - namespace: '*'
       server: https://kubernetes.default.svc
-  namespaceResourceWhitelist:
-    - group: apps
-      kind: Deployment
-    - group: ""
-      kind: Namespace
+
+  # Allow apps to source manifests from these Git or Helm repos
+  sourceRepos:
+    - http://localhost:8082/repository/helm-repo/
+    - https://github.com/janushanth/CI-CD_architecture.git
+
+  # Optional: Limit allowed Helm chart versions
+  sourceNamespaces:
+    - argocd
+
+  # Optional: Allow only specific kinds to be created
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+
+  # Optional: Enforce app sync policies
+  syncWindows: []

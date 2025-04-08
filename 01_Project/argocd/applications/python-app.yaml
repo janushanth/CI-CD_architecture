@@ -1,22 +1,23 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: app-a
+  name: my-app
   namespace: argocd
 spec:
-  destination:
-    namespace: python-apps-ns
-    server: https://kubernetes.default.svc
+  project: default
   source:
     repoURL: http://host.docker.internal:8082/repository/helm-repo/
     chart: python-app-hc
-    targetRevision: 55.0.0
+    targetRevision: 55.0.0              # version of the chart
     helm:
       valueFiles:
-        - environments/dev/values.yaml
+        - values.yaml                   # optional, if you have inline or remote values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: my-app
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
-  syncOptions:
-    - CreateNamespace=true
+    syncOptions:
+      - CreateNamespace=true
