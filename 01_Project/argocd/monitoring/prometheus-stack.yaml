@@ -29,6 +29,14 @@ spec:
           enabled: false  # Disable kube-state-metrics (optional, if not needed)
         nodeExporter:
           enabled: false  # Disable node exporter (optional, if not needed)
+        prometheusOperator:
+          enabled: false  # Disable Prometheus Operator
+        serviceMonitors:
+          enabled: false  # Disable ServiceMonitors
+        podMonitors:
+          enabled: false  # Disable PodMonitors
+        alertmanagerConfig:
+          enabled: false  # Disable AlertmanagerConfig
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
