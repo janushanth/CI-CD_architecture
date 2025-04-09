@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://grafana.github.io/helm-charts
     chart: grafana
-    targetRevision: 7.3.9
+    targetRevision: 7.3.9  # You can also set this to "latest"
     helm:
       releaseName: grafana
       values: |
@@ -25,10 +25,10 @@ spec:
                 url: http://prometheus-server.monitoring.svc.cluster.local
                 isDefault: true
         persistence:
-          enabled: false
+          enabled: false  # Disable persistence, set to 'true' if you need persistent storage
   destination:
     server: https://kubernetes.default.svc
-    namespace: monitoring
+    namespace: monitoring  # Ensure that Grafana is deployed in the 'monitoring' namespace
   syncPolicy:
     automated:
       prune: true
