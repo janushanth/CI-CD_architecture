@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/janushanth/CI-CD_architecture.git
-    path: monitoring/crds
+    path: monitoring/crds/
     targetRevision: HEAD
     directory:
       recurse: true
