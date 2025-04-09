@@ -164,3 +164,31 @@ argocd repo add http://host.docker.internal:8082/repository/helm-repo/ \
   --password nexusadmin
   
 kubectl apply -f root-app.yaml -n argocd  
+
+
+# Deploy Prometheus & Grafana via ArgoCD using kube-prometheus-stack
+kubectl get svc -n monitoring
+
+Grafana url - http://localhost:31580/
+admin
+admin123
+
+
+# Create a separate ArgoCD Application just for CRDs
+
+curl -o monitoring/crds/bundle.yaml https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/bundle.yaml
+
+your-git-repo/
+├── monitoring/
+│   ├── crds/
+│   │   └── bundle.yaml               # <- Prometheus CRDs
+│   ├── prometheus-stack.yaml         # <- ArgoCD App for Helm chart
+│   └── prometheus-crds.yaml          # <- ArgoCD App for CRDs
+├── applications/
+│   └── app1/
+│       └── app1.yaml
+├── projects/
+│   └── default-project.yaml          # <- optional, if you're using AppProjects
+
+
+    
