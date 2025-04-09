@@ -16,6 +16,7 @@ spec:
     - http://host.docker.internal:8082/repository/helm-repo/
     - https://github.com/janushanth/CI-CD_architecture.git
     - https://prometheus-community.github.io/helm-charts
+    - https://grafana.github.io/helm-charts  # Add this line
 
   # Optional: Limit allowed Helm chart versions
   sourceNamespaces:
