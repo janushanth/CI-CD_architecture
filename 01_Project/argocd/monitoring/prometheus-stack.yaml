@@ -8,17 +8,27 @@ spec:
   source:
     repoURL: https://prometheus-community.github.io/helm-charts
     chart: kube-prometheus-stack
-    targetRevision: 58.3.0 # you can update to the latest chart version
+    targetRevision: 58.3.0 # You can update to the latest chart version
     helm:
       releaseName: prometheus
       values: |
-        grafana:
-          adminPassword: "admin123"  # set your desired Grafana password
-          service:
-            type: NodePort           # so you can access from localhost in Docker Desktop
         prometheus:
+          enabled: true
           service:
-            type: NodePort
+            type: NodePort  # This allows access from localhost in Docker Desktop
+        grafana:
+          enabled: true
+          adminPassword: "admin123"  # Set your desired Grafana password
+          service:
+            type: NodePort  # This allows access from localhost in Docker Desktop
+        alertmanager:
+          enabled: false  # Disable Alertmanager
+        thanos:
+          enabled: false  # Disable Thanos
+        kubeStateMetrics:
+          enabled: false  # Disable kube-state-metrics (optional, if not needed)
+        nodeExporter:
+          enabled: false  # Disable node exporter (optional, if not needed)
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
