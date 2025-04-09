@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/janushanth/CI-CD_architecture.git
     targetRevision: main
-    path: 01_Project/argocd/applications
+    path: 01_Project/argocd
     directory:
       recurse: true
   destination:
