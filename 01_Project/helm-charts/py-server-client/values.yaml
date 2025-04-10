@@ -1,0 +1,43 @@
+apiToken: "super-secret-token"
+
+imagePullSecrets:
+  enabled: true
+  name: nexus-registry-secret
+  registry: localhost:8083
+  username: "jenkins"
+  password: "Jenkins@123#"
+  email: "jenkins@gmail.com"
+
+server:
+  port: 6000
+  replicaCount: 1
+  service:
+    type: NodePort
+    port: 6000              # Service exposes port 80 externally
+    targetPort: 6000      # Forward to container’s port
+
+  image:
+    repository: localhost:8083/repository/docker-repo/python-flask-app
+    pullPolicy: Always
+    tag: "56"
+
+client:
+  replicaCount: 1
+  pollInterval: 10
+  serverUrl: "http://server:6000"
+  image:
+    repository: localhost:8083/repository/docker-repo/python-flask-app
+    pullPolicy: Always
+    tag: "56"
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  hosts:
+    - host: localhost
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []

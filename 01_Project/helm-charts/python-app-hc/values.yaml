@@ -24,3 +24,4 @@ ingress:
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
   tls: []
+ 

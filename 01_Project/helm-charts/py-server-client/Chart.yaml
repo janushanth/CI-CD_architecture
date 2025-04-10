@@ -1,0 +1,6 @@
+apiVersion: v2
+name: py-server-client
+description: A Helm chart for Python server-client app
+type: application
+version: 0.1.0
+appVersion: "1.0"
