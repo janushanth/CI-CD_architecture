@@ -45,7 +45,7 @@ pipeline {
         stage('Build Docker Image Client') {
             steps {
                 script {
-                    docker.build("${DOCKER_IMAGE_CLIENT}", "py-server-client/client")
+                    docker.build("${DOCKER_IMAGE_TAG_CLIENT}", "py-server-client/client")
                 }
             }
         }
