@@ -19,7 +19,7 @@ server:
   image:
     repository: localhost:8083/repository/docker-repo/py-server-app
     pullPolicy: Always
-    tag: 12
+    tag: 13
 
 client:
   replicaCount: 1
@@ -28,7 +28,7 @@ client:
   image:
     repository: localhost:8083/repository/docker-repo/py-client-app
     pullPolicy: Always
-    tag: 12
+    tag: 13
 
 ingress:
   enabled: true
