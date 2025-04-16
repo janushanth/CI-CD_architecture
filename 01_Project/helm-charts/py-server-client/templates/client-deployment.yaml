@@ -28,6 +28,8 @@ spec:
               key: API_TOKEN
         - name: POLL_INTERVAL
           value: "{{ .Values.client.pollInterval }}"
+        - name: PYTHONUNBUFFERED
+          value: "1"          
       {{- if .Values.imagePullSecrets.enabled }}
       imagePullSecrets:
         - name: {{ .Values.imagePullSecrets.name }}
