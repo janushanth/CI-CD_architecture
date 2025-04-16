@@ -1,3 +1,13 @@
+## Docker Desktop issue
+
+edit your Docker daemon config (/etc/docker/daemon.json):
+
+{
+  "dns": ["8.8.8.8", "1.1.1.1"]
+}
+
+sudo systemctl restart docker
+
 
 ### Jenkins #####
 docker exec -it jenkins cat /var/jenkins_home/secrets/initialAdminPassword
