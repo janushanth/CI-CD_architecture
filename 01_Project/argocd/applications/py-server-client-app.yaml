@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: py-server-client-app
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: http://host.docker.internal:8082/repository/helm-repo/
+    chart: py-server-client
+    targetRevision: "*"            # version of the chart
+    helm:
+      valueFiles:
+        - values.yaml                   # optional, if you have inline or remote values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: py-server-client-app-np
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
