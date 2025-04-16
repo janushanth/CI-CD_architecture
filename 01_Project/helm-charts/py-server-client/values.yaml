@@ -19,7 +19,7 @@ server:
   image:
     repository: localhost:8083/repository/docker-repo/python-flask-app
     pullPolicy: Always
-    tag: "56"
+    tag: 11
 
 client:
   replicaCount: 1
@@ -28,7 +28,7 @@ client:
   image:
     repository: localhost:8083/repository/docker-repo/python-flask-app
     pullPolicy: Always
-    tag: "56"
+    tag: 11
 
 ingress:
   enabled: true
